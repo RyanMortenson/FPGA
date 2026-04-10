@@ -44,18 +44,18 @@ ecdoctor
 ```bash
 fpga
 ecmods
-ecmake lab_project/pong sim
-ecmake lab_multiseg/seven_segment4 sim_tb
-ecmake lab_project/project_top synth
-ecmake lab_project/project_top implement
-ecbit lab_project/project_top
-ecclean lab_project/project_top
+ecmake graphics_project/pong sim
+ecmake multi_segment/seven_segment4 sim_tb
+ecmake graphics_project/project_top synth
+ecmake graphics_project/project_top implement
+ecbit graphics_project/project_top
+ecclean graphics_project/project_top
 ```
 
 If you are already in a module directory:
 
 ```bash
-cd lab_project/pong
+cd graphics_project/pong
 ecmake sim
 ```
 
@@ -64,10 +64,10 @@ ecmake sim
 ```bash
 make mods
 make doctor
-make sim MOD=lab_project/pong
-make sim_tb MOD=lab_multiseg/seven_segment4
-make synth MOD=lab_project/project_top
-make implement MOD=lab_project/project_top
+make sim MOD=graphics_project/pong
+make sim_tb MOD=multi_segment/seven_segment4
+make synth MOD=graphics_project/project_top
+make implement MOD=graphics_project/project_top
 ```
 
 ## 5) Version parity note
