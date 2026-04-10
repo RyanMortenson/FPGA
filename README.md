@@ -23,6 +23,35 @@ The same HDL + Makefile pattern works on both operating systems:
 
 ---
 
+
+## 0) Command compatibility by operating system (important)
+
+This repo's Makefiles set `SHELL := /bin/bash`, and helper commands (`ecmake`, `ecmods`, `ecdoctor`, etc.) are Bash functions loaded from `resources/shell_helpers.sh`. In practice that means:
+
+- **Supported directly**
+  - **Arch Linux terminal (bash/zsh/fish launching bash commands)**
+  - **Windows Git Bash** (recommended for this repo on Windows)
+  - **Windows MSYS2 shell** with GNU make available (`make` or `mingw32-make`)
+- **Not a first-class path for this repo**
+  - Plain **PowerShell** or **cmd.exe** without a Bash layer.
+  - You can still launch Vivado from those shells, but this repo's Make targets are written for Bash semantics.
+
+### Quick matrix
+
+| Task | Arch Linux terminal | Windows Git Bash | PowerShell / cmd.exe |
+|---|---|---|---|
+| Source repo helpers (`source resources/shell_helpers.sh`) | ✅ | ✅ | ❌ (`source` + Bash functions unavailable) |
+| `make ...` targets in this repo | ✅ | ✅ (if `make` or `mingw32-make` is installed/detected) | ⚠️ Usually fails unless you manually provide a Bash-compatible make environment |
+| Vivado CLI (`vivado`, `xvlog`, `xelab`, `xsim`) | ✅ | ✅ | ✅ |
+| Recommended workflow for this repo | ✅ Native | ✅ Native | ❌ Use Git Bash instead |
+
+### Why this recommendation is robust
+
+- Arch provides GNU Make directly (`core/make` package), so `make` is native and straightforward.
+- On Windows, GNU Make is commonly exposed as either `make` or `mingw32-make` in MSYS2/MinGW environments.
+- AMD tool docs consistently describe shell setup via `settings64.sh` (Linux shells) and `settings64.bat` (Windows command shells); this repo wraps that by exporting `VIVADO_ROOT` and sourcing `resources/vivado_env.sh`.
+
+---
 ## 1) One-time setup
 
 ### Arch Linux
@@ -302,15 +331,97 @@ make download MOD=<your_project>/<top_module_dir>
 
 ---
 
-## 9) Suggested end-to-end workflow for new designs
+## 9) End-to-end workflows by OS (copy/paste friendly)
 
-1. Create module directory + module `Makefile`.
-2. Add RTL and run fast simulation (`sim_tb` or `sim_nogui`).
-3. Iterate until functionally correct.
-4. Add/verify `basys3.xdc` and top-level module wiring.
-5. Run `synth`, then `implement`.
-6. Run `download` and hardware test.
-7. Use `clean` / `ecclean` when switching branches or after tool crashes.
+Below are practical, explicit workflows from environment setup to bitstream download.
+
+### A) Windows workflow (recommended shell: **Git Bash**)
+
+> Use **Git Bash**, not plain PowerShell/cmd, for repo `make` targets.
+
+```bash
+# 0) One-time in Git Bash profile (~/.bashrc)
+export FPGA_REPO='/c/Users/<you>/FPGA'
+export VIVADO_ROOT='/c/AMDDesignTools/2025.2/Vivado'
+# If needed on your machine:
+# export EC_MAKE_CMD=mingw32-make
+source "$FPGA_REPO/resources/shell_helpers.sh"
+
+# 1) Start a new terminal, verify toolchain
+source ~/.bashrc
+ecdoctor
+
+# 2) Go to repo and pick/create a module
+fpga
+ecmods
+# e.g. choose demo/pong or your own module path
+
+# 3) Edit RTL files (your editor of choice), then run simulation
+ecmake demo/pong sim_nogui
+# or tb-based flow if module has tb.sv:
+# ecmake common_modules/debounce/debounce sim_tb
+
+# 4) Build bitstream for board top
+ecmake demo/project_top synth
+ecmake demo/project_top implement
+
+# 5) Program board
+ecmake demo/project_top download
+
+# 6) If something is stuck/locked
+ecclean demo/project_top
+```
+
+If you prefer root-driven commands instead of helpers:
+
+```bash
+make sim_nogui MOD=demo/pong
+make synth MOD=demo/project_top
+make implement MOD=demo/project_top
+make download MOD=demo/project_top
+```
+
+### B) Arch Linux workflow (native bash)
+
+```bash
+# 0) One-time packages
+sudo pacman -S --needed git make python
+
+# 1) One-time shell profile (~/.bashrc)
+export FPGA_REPO="$HOME/FPGA"
+export VIVADO_ROOT="/tools/Xilinx/Vivado/2025.2"
+source "$FPGA_REPO/resources/shell_helpers.sh"
+
+# 2) Start a new shell and verify
+source ~/.bashrc
+ecdoctor
+
+# 3) Edit RTL, then simulate quickly
+fpga
+ecmake demo/pong sim_nogui
+# or tb-based:
+# ecmake common_modules/debounce/debounce sim_tb
+
+# 4) Synthesize + implement
+ecmake demo/project_top synth
+ecmake demo/project_top implement
+
+# 5) Download to board
+ecmake demo/project_top download
+
+# 6) Cleanup when needed
+ecclean demo/project_top
+```
+
+### C) If you're in PowerShell or cmd.exe on Windows
+
+Use those shells to install software or launch GUI apps if you want, but for this repo's build flow:
+
+1. Open **Git Bash**.
+2. Run `source ~/.bashrc`.
+3. Use `ecmake ...` / `make ...` there.
+
+This avoids the common Windows issues with Bash-specific Make recipes and helper functions.
 
 ---
 
