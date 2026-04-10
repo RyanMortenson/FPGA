@@ -1,4 +1,4 @@
-# FPGA Workflow Guide (Windows + Debian/Linux)
+# FPGA Workflow Guide (Windows + Arch Linux)
 
 > [!TIP]
 > **Quick start (copy + clone):** Open a terminal, pick where you want the project, then run:
@@ -19,15 +19,21 @@ This repository is designed to be a **reusable FPGA project template**: you can 
 The same HDL + Makefile pattern works on both operating systems:
 
 - **Windows**: Git Bash + Vivado + GNU make (or `mingw32-make`)
-- **Debian/Linux (Ubuntu included)**: Bash + Vivado + GNU make
+- **Arch Linux**: Bash + Vivado + GNU make
 
 ---
 
 ## 1) One-time setup
 
-### Debian/Linux
+### Arch Linux
 
-1. Install `git`, `make`, `python3`, and Vivado.
+1. Install prerequisites on Arch Linux:
+
+```bash
+sudo pacman -S --needed git make python
+```
+
+Then install Vivado.
 2. Add the following to `~/.bashrc` (adjust paths):
 
 ```bash

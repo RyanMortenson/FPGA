@@ -36,7 +36,7 @@ _ec_detect_make_cmd() {
 _ec_require_make_cmd() {
     local make_cmd
     make_cmd="$(_ec_detect_make_cmd)" || {
-        echo "No GNU make compatible command found. Install make (Debian) or mingw32-make (Windows/Git Bash)." >&2
+        echo "No GNU make compatible command found. Install make (Arch Linux: `pacman -S make`) or mingw32-make (Windows/Git Bash)." >&2
         return 1
     }
     printf '%s\n' "$make_cmd"

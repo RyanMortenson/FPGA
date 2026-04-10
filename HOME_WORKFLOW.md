@@ -1,6 +1,6 @@
 # Home Workflow (Cross-Platform)
 
-This repo keeps class Makefiles intact while making the shell experience consistent across Debian/Linux and Windows Git Bash.
+This repo keeps class Makefiles intact while making the shell experience consistent across Arch Linux and Windows Git Bash.
 
 ## 1) One-time setup
 
@@ -8,7 +8,7 @@ Add to `~/.bashrc`:
 
 ```bash
 export FPGA_REPO="/absolute/path/to/FPGA"
-# Linux example:
+# Arch Linux example:
 # export VIVADO_ROOT="/tools/Xilinx/Vivado/2025.2"
 # Windows Git Bash example:
 # export VIVADO_ROOT='/c/AMDDesignTools/2025.2/Vivado'
