@@ -12,12 +12,12 @@ help:
 	@echo '  make doctor'
 	@echo ''
 	@echo 'Run a target inside a module directory:'
-	@echo '  make sim MOD=lab_project/pong'
-	@echo '  make sim_tb MOD=lab_multiseg/seven_segment4'
-	@echo '  make synth MOD=lab_project/project_top'
-	@echo '  make implement MOD=lab_project/project_top'
-	@echo '  make clean MOD=lab_project/project_top'
-	@echo '  make passoff_check MOD=lab_project'
+	@echo '  make sim MOD=graphics_project/pong'
+	@echo '  make sim_tb MOD=multi_segment/seven_segment4'
+	@echo '  make synth MOD=graphics_project/project_top'
+	@echo '  make implement MOD=graphics_project/project_top'
+	@echo '  make clean MOD=graphics_project/project_top'
+	@echo '  make passoff_check MOD=graphics_project'
 	@echo ''
 	@echo 'Optional environment overrides:'
 	@echo '  VIVADO_SETTINGS=/abs/path/to/settings64.sh'
@@ -31,7 +31,7 @@ doctor:
 
 define RUN_IN_MOD
 	@if [[ -z "$(MOD)" ]]; then \
-		echo 'Error: MOD is required. Example: make sim MOD=lab_project/pong'; \
+		echo 'Error: MOD is required. Example: make sim MOD=graphics_project/pong'; \
 		exit 1; \
 	fi
 	@if [[ ! -f "$(MOD)/Makefile" ]]; then \
