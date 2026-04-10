@@ -360,3 +360,41 @@ ecclean <module>
 ```
 
 If you keep each module self-contained and keep `SV_FILES`, `MODULE_NAME`, and constraints accurate, this template scales cleanly from tiny exercises to full FPGA projects.
+
+---
+
+## Pong demo quick-start (show-and-tell)
+
+The pong example now lives under `demo/`:
+
+- `demo/pong/` – core gameplay module + `sim.tcl`
+- `demo/graphics_project/` – supporting render/top-level modules (`ball_drawer`, `v_line_drawer`, `project_top`, etc.)
+
+### Run the pong simulation quickly
+
+From repo root:
+
+```bash
+make sim MOD=demo/pong
+```
+
+Or via helper command:
+
+```bash
+ecmake demo/pong sim
+```
+
+### Explore the testbench/Tcl flows
+
+- For Tcl-driven behavior, inspect: `demo/pong/sim.tcl`
+- For timing/display integration, inspect:
+  - `demo/graphics_project/project_top/project_top.sv`
+  - `common_modules/multi_segment/seven_segment4/tb.sv`
+  - `common_modules/video_signal/vga_timing/tb.sv`
+
+### Build the full demo top
+
+```bash
+make synth MOD=demo/graphics_project/project_top
+make implement MOD=demo/graphics_project/project_top
+```

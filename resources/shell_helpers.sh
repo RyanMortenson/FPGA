@@ -136,8 +136,8 @@ ecmake() {
         mod="$(_ec_find_module_from_pwd)" || {
             echo 'usage: ecmake <module-dir> <target> [extra make args...]' >&2
             echo 'or run inside a module directory: ecmake <target>' >&2
-            echo 'example: ecmake graphics_project/project_top synth' >&2
-            echo 'example: (inside graphics_project/pong) ecmake sim' >&2
+            echo 'example: ecmake demo/graphics_project/project_top synth' >&2
+            echo 'example: (inside demo/pong) ecmake sim' >&2
             return 1
         }
     else
