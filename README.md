@@ -214,7 +214,7 @@ You should see:
 ### Jump to repo root
 
 ```bash
-ecen320
+fpga
 ```
 
 ### List buildable modules
@@ -449,7 +449,7 @@ If you just want to keep moving, use Vivado Hardware Manager first and come back
 ### 9.1 Fast HDL iteration for a testbench module
 
 ```bash
-ecen320
+fpga
 ectb lab_multiseg/seven_segment4
 ectbgui lab_multiseg/seven_segment4
 ```
@@ -457,7 +457,7 @@ ectbgui lab_multiseg/seven_segment4
 ### 9.2 Fast HDL iteration for a Tcl-driven module
 
 ```bash
-ecen320
+fpga
 ecsim lab_project/pong
 ecsimgui lab_project/pong
 ```
@@ -465,7 +465,7 @@ ecsimgui lab_project/pong
 ### 9.3 Build and test on the board
 
 ```bash
-ecen320
+fpga
 ecbit lab_project/project_top
 ```
 

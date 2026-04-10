@@ -2,11 +2,11 @@
 # Source this from ~/.bashrc:
 #   source /absolute/path/to/FPGA/resources/shell_helpers.sh
 
-_ecen320_shell_helpers_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+_fpga_shell_helpers_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 
 _ec_need_repo() {
     if [[ -z "${FPGA_REPO:-}" ]]; then
-        FPGA_REPO="${_ecen320_shell_helpers_root}"
+        FPGA_REPO="${_fpga_shell_helpers_root}"
     fi
     if [[ ! -d "${FPGA_REPO}" ]]; then
         echo "FPGA_REPO is not set to a valid repo path." >&2
@@ -63,16 +63,16 @@ _ec_remove_workdir() {
     rm -rf "$workdir"
 }
 
-ecen320() {
-    cd "${_ecen320_shell_helpers_root}"
+fpga() {
+    cd "${_fpga_shell_helpers_root}"
 }
 
 viv() {
-    . "${_ecen320_shell_helpers_root}/resources/vivado_env.sh"
+    . "${_fpga_shell_helpers_root}/resources/vivado_env.sh"
 }
 
 ecmods() {
-    (cd "${_ecen320_shell_helpers_root}" && make mods)
+    (cd "${_fpga_shell_helpers_root}" && make mods)
 }
 
 ecmake() {
@@ -83,11 +83,11 @@ ecmake() {
     fi
     local mod="$1"
     shift
-    (cd "${_ecen320_shell_helpers_root}" && make MOD="${mod}" "$@")
+    (cd "${_fpga_shell_helpers_root}" && make MOD="${mod}" "$@")
 }
 
 ecdoctor() {
-    "${_ecen320_shell_helpers_root}/resources/doctor.sh"
+    "${_fpga_shell_helpers_root}/resources/doctor.sh"
 }
 
 ecclean() {
@@ -337,4 +337,9 @@ ecbit() {
         echo "ecbit: implement finished but design.bit was not found at $bit" >&2
         return 1
     fi
+}
+
+# Backward-compatible alias
+ecen320() {
+    fpga
 }
