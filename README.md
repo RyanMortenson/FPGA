@@ -360,3 +360,41 @@ ecclean <module>
 ```
 
 If you keep each module self-contained and keep `SV_FILES`, `MODULE_NAME`, and constraints accurate, this template scales cleanly from tiny exercises to full FPGA projects.
+
+---
+
+## 12) Demo: Pong (show-and-tell reference design)
+
+The repository includes a complete Pong demo in `demo/pong`, and all Pong-specific graphics modules now live with that demo so the template stays uncluttered.
+
+### What to look at
+
+- Core game logic: `demo/pong/pong.sv`
+- Graphics helpers:
+  - `demo/pong/v_line_drawer/v_line_drawer.sv`
+  - `demo/pong/ball_drawer/ball_drawer.sv`
+  - `demo/pong/bitmap_mem/bitmap_mem.sv`
+- Board top integration:
+  - `demo/pong/project_top/project_top.sv`
+  - `demo/pong/project_top/basys3.xdc`
+- Tcl/sim examples:
+  - `demo/pong/sim.tcl`
+  - `demo/pong/v_line_drawer/sim.tcl`
+  - `demo/pong/ball_drawer/sim.tcl`
+
+### Bring up Pong quickly
+
+From repo root:
+
+```bash
+make sim MOD=demo/pong
+make synth MOD=demo/pong/project_top
+make implement MOD=demo/pong/project_top
+make download MOD=demo/pong/project_top
+```
+
+If you are learning the flow, Pong is a good example to inspect for:
+
+- a complete multi-module `SV_FILES` setup in module `Makefile`s,
+- a runnable simulation Tcl flow (`sim.tcl`), and
+- a working board top + constraints pairing.
