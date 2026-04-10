@@ -5,7 +5,10 @@
 >
 > ```bash
 > cd <your-local-parent-folder>
-> git clone https://github.com/<owner>/FPGA.git
+> ```
+>
+> ```bash
+> git clone https://github.com/RyanMortenson/FPGA.git
 > cd FPGA
 > ```
 >
