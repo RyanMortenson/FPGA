@@ -1,5 +1,19 @@
 # FPGA Workflow Guide (Windows + Debian/Linux)
 
+> [!TIP]
+> **Quick start (copy + clone):** Open a terminal, pick where you want the project, then run:
+>
+> ```bash
+> cd <your-local-parent-folder>
+> ```
+>
+> ```bash
+> git clone https://github.com/RyanMortenson/FPGA.git
+> cd FPGA
+> ```
+>
+> To quickly copy snippets from this README, click the copy button on any code block and paste into your terminal.
+
 This repository is designed to be a **reusable FPGA project template**: you can copy the workflow to new labs/projects, keep your modules organized, and run simulation/synthesis/implementation/download from the command line.
 
 The same HDL + Makefile pattern works on both operating systems:
