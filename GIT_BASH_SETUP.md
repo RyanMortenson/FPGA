@@ -40,7 +40,7 @@ ecdoctor
 ```bash
 ecmods
 ecmake demo/pong sim
-ecmake graphics_project/project_top synth
+ecmake demo/pong/project_top synth
 ```
 
 This is the smoothest route on Windows because the helper handles Vivado environment setup and make-command differences for you.

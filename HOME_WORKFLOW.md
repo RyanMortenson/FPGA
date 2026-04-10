@@ -46,10 +46,10 @@ fpga
 ecmods
 ecmake demo/pong sim
 ecmake common_modules/multi_segment/seven_segment4 sim_tb
-ecmake graphics_project/project_top synth
-ecmake graphics_project/project_top implement
-ecbit graphics_project/project_top
-ecclean graphics_project/project_top
+ecmake demo/pong/project_top synth
+ecmake demo/pong/project_top implement
+ecbit demo/pong/project_top
+ecclean demo/pong/project_top
 ```
 
 If you are already in a module directory:
@@ -66,8 +66,8 @@ make mods
 make doctor
 make sim MOD=demo/pong
 make sim_tb MOD=common_modules/multi_segment/seven_segment4
-make synth MOD=graphics_project/project_top
-make implement MOD=graphics_project/project_top
+make synth MOD=demo/pong/project_top
+make implement MOD=demo/pong/project_top
 ```
 
 ## 5) Version parity note
