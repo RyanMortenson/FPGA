@@ -7,7 +7,7 @@ This keeps the class Makefiles intact, but removes the need to manually baby the
 Add this line to your `~/.bashrc`:
 
 ```bash
-source /absolute/path/to/ecen-320/resources/shell_helpers.sh
+source /absolute/path/to/FPGA/resources/shell_helpers.sh
 ```
 
 Then open a new shell (or run `source ~/.bashrc`).
@@ -15,7 +15,7 @@ Then open a new shell (or run `source ~/.bashrc`).
 Useful commands after that:
 
 ```bash
-ecen320                     # jump to repo root
+fpga                     # jump to repo root
 viv                         # source Vivado into the current shell
 ecmods                      # list buildable module directories
 ecmake lab_project/pong sim

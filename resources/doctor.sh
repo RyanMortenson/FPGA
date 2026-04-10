@@ -34,7 +34,7 @@ if . "${repo_root}/resources/vivado_env.sh" >/dev/null 2>&1 && \
    command -v xvlog >/dev/null 2>&1 && \
    command -v xelab >/dev/null 2>&1 && \
    command -v xsim >/dev/null 2>&1; then
-    status_ok "Vivado source: ${ECEN320_VIVADO_SETTINGS:-${VIVADO_ROOT:-on PATH}}"
+    status_ok "Vivado source: ${FPGA_VIVADO_SETTINGS:-${VIVADO_ROOT:-on PATH}}"
     status_ok "vivado: $(command -v vivado)"
     status_ok "xvlog:  $(command -v xvlog)"
     status_ok "xelab:  $(command -v xelab)"
