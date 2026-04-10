@@ -15,10 +15,39 @@ _ec_need_repo() {
     fi
 }
 
+
+_ec_detect_make_cmd() {
+    if [[ -n "${EC_MAKE_CMD:-}" ]]; then
+        printf '%s\n' "${EC_MAKE_CMD}"
+        return 0
+    fi
+
+    local candidate
+    for candidate in make mingw32-make gmake; do
+        if command -v "$candidate" >/dev/null 2>&1; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+_ec_require_make_cmd() {
+    local make_cmd
+    make_cmd="$(_ec_detect_make_cmd)" || {
+        echo "No GNU make compatible command found. Install make (Debian) or mingw32-make (Windows/Git Bash)." >&2
+        return 1
+    }
+    printf '%s\n' "$make_cmd"
+}
+
 _ec_make_var() {
     local moddir="$1"
     local var="$2"
-    make -s -C "$moddir" --eval='print-%: ; @echo $($*)' "print-$var" 2>/dev/null
+    local make_cmd
+    make_cmd="$(_ec_require_make_cmd)" || return 1
+    "$make_cmd" -s -C "$moddir" --eval='print-%: ; @echo $($*)' "print-$var" 2>/dev/null
 }
 
 _ec_show_log_and_check() {
@@ -71,19 +100,55 @@ viv() {
     . "${_fpga_shell_helpers_root}/resources/vivado_env.sh"
 }
 
+
+_ec_find_module_from_pwd() {
+    local repo_root="${_fpga_shell_helpers_root}"
+    local here="$(pwd -P)"
+    local probe="$here"
+
+    while [[ "$probe" == "$repo_root"/* || "$probe" == "$repo_root" ]]; do
+        if [[ -f "$probe/Makefile" ]]; then
+            local rel="${probe#"$repo_root"/}"
+            if [[ "$probe" == "$repo_root" ]]; then
+                return 1
+            fi
+            printf '%s\n' "$rel"
+            return 0
+        fi
+        [[ "$probe" == "$repo_root" ]] && break
+        probe="$(dirname "$probe")"
+    done
+
+    return 1
+}
+
 ecmods() {
-    (cd "${_fpga_shell_helpers_root}" && make mods)
+    (cd "${_fpga_shell_helpers_root}" && "$(_ec_require_make_cmd)" mods)
 }
 
 ecmake() {
-    if [[ $# -lt 2 ]]; then
+    local mod target
+
+    if [[ $# -ge 2 ]] && [[ -f "${_fpga_shell_helpers_root}/$1/Makefile" ]]; then
+        mod="$1"
+        shift
+    elif [[ $# -ge 1 ]]; then
+        mod="$(_ec_find_module_from_pwd)" || {
+            echo 'usage: ecmake <module-dir> <target> [extra make args...]' >&2
+            echo 'or run inside a module directory: ecmake <target>' >&2
+            echo 'example: ecmake lab_project/project_top synth' >&2
+            echo 'example: (inside lab_project/pong) ecmake sim' >&2
+            return 1
+        }
+    else
         echo 'usage: ecmake <module-dir> <target> [extra make args...]' >&2
-        echo 'example: ecmake lab_project/project_top synth' >&2
+        echo 'or run inside a module directory: ecmake <target>' >&2
         return 1
     fi
-    local mod="$1"
+
+    target="$1"
     shift
-    (cd "${_fpga_shell_helpers_root}" && make MOD="${mod}" "$@")
+    (cd "${_fpga_shell_helpers_root}" && "$(_ec_require_make_cmd)" MOD="${mod}" "${target}" "$@")
 }
 
 ecdoctor() {

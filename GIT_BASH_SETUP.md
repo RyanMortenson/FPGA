@@ -1,36 +1,46 @@
-# Git Bash setup for ECEN 320 workflow on Windows
+# Windows Git Bash Setup for ECEN 320-Style Flow
 
-1. Put the repo at a stable path, for example:
-   /c/Users/Ryan Mortenson/FPGA
+## 1) Recommended path
 
-2. Add these lines to ~/.bashrc:
+Place repo at a stable path, for example:
+
+`/c/Users/<you>/FPGA`
+
+## 2) Configure `~/.bashrc`
 
 ```bash
-export FPGA_REPO='/c/Users/Ryan Mortenson/FPGA'
-export VIVADO_VERSION=2025.2
+export FPGA_REPO='/c/Users/<you>/FPGA'
+export VIVADO_ROOT='/c/AMDDesignTools/2025.2/Vivado'
+# If your environment doesn't expose `make`, uncomment:
+# export EC_MAKE_CMD=mingw32-make
 source "$FPGA_REPO/resources/shell_helpers.sh"
 ```
 
-3. If auto-detect misses your install, add one of these instead:
+If auto-detection cannot locate Vivado, set one of:
 
 ```bash
-export VIVADO_ROOT=/c/Xilinx/Vivado/2025.2
+export VIVADO_ROOT='/c/Xilinx/Vivado/2025.2'
 ```
 
 or
 
 ```bash
-export VIVADO_SETTINGS=/c/Xilinx/Vivado/2025.2/settings64.bat
+export VIVADO_SETTINGS='/c/Xilinx/Vivado/2025.2/settings64.bat'
 ```
 
-4. Reload the shell:
+## 3) Reload + test
 
 ```bash
 source ~/.bashrc
-```
-
-5. Verify:
-
-```bash
 ecdoctor
 ```
+
+## 4) Use helper commands
+
+```bash
+ecmods
+ecmake lab_project/pong sim
+ecmake lab_project/project_top synth
+```
+
+This is the smoothest route on Windows because the helper handles Vivado environment setup and make-command differences for you.

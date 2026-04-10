@@ -16,10 +16,27 @@ status_fail() {
     printf '[fail] %s\n' "$1"
 }
 
+detect_make_cmd() {
+    if [[ -n "${EC_MAKE_CMD:-}" ]]; then
+        printf '%s\n' "${EC_MAKE_CMD}"
+        return 0
+    fi
+
+    local candidate
+    for candidate in make mingw32-make gmake; do
+        if command -v "${candidate}" >/dev/null 2>&1; then
+            printf '%s\n' "${candidate}"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
 printf 'ECEN 320 doctor\n'
 printf 'repo: %s\n\n' "${repo_root}"
 
-for exe in git make python3; do
+for exe in git python3; do
     if command -v "${exe}" >/dev/null 2>&1; then
         status_ok "found ${exe}: $(command -v "${exe}")"
     else
@@ -27,6 +44,14 @@ for exe in git make python3; do
         exit 1
     fi
 done
+
+if make_cmd="$(detect_make_cmd)"; then
+    status_ok "found make command: ${make_cmd} ($(command -v "${make_cmd}"))"
+    "${make_cmd}" --version | head -n 1 || true
+else
+    status_fail 'missing GNU make compatible command (make, mingw32-make, or gmake)'
+    exit 1
+fi
 
 echo
 if . "${repo_root}/resources/vivado_env.sh" >/dev/null 2>&1 && \
@@ -42,6 +67,6 @@ if . "${repo_root}/resources/vivado_env.sh" >/dev/null 2>&1 && \
     vivado -version | head -n 1
 else
     status_fail 'Vivado environment could not be initialized'
-    printf 'hint: export VIVADO_ROOT=/c/AMDDesignTools/2025.2/Vivado\n'
+    printf 'hint: set VIVADO_ROOT and/or VIVADO_SETTINGS for your OS before running builds\n'
     exit 1
 fi

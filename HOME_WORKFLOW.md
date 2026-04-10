@@ -1,45 +1,65 @@
-# Home Workflow for ECEN 320
+# Home Workflow (Cross-Platform)
 
-This keeps the class Makefiles intact, but removes the need to manually baby the Vivado environment every time.
+This repo keeps class Makefiles intact while making the shell experience consistent across Debian/Linux and Windows Git Bash.
 
-## 1) One-time shell setup
+## 1) One-time setup
 
-Add this line to your `~/.bashrc`:
+Add to `~/.bashrc`:
 
 ```bash
-source /absolute/path/to/FPGA/resources/shell_helpers.sh
+export FPGA_REPO="/absolute/path/to/FPGA"
+# Linux example:
+# export VIVADO_ROOT="/tools/Xilinx/Vivado/2025.2"
+# Windows Git Bash example:
+# export VIVADO_ROOT='/c/AMDDesignTools/2025.2/Vivado'
+source "$FPGA_REPO/resources/shell_helpers.sh"
 ```
 
-Then open a new shell (or run `source ~/.bashrc`).
-
-Useful commands after that:
+If needed (mostly Windows), pin make executable:
 
 ```bash
-fpga                     # jump to repo root
-viv                         # source Vivado into the current shell
-ecmods                      # list buildable module directories
+export EC_MAKE_CMD=mingw32-make
+```
+
+Reload:
+
+```bash
+source ~/.bashrc
+```
+
+## 2) Validate
+
+```bash
+ecdoctor
+```
+
+`ecdoctor` checks:
+- `git`
+- `python3`
+- GNU make-compatible command (`make`, `mingw32-make`, or `gmake`)
+- Vivado toolchain (`vivado`, `xvlog`, `xelab`, `xsim`)
+
+## 3) Recommended daily flow
+
+```bash
+fpga
+ecmods
 ecmake lab_project/pong sim
+ecmake lab_multiseg/seven_segment4 sim_tb
 ecmake lab_project/project_top synth
-ecdoctor                    # check toolchain wiring
+ecmake lab_project/project_top implement
+ecbit lab_project/project_top
+ecclean lab_project/project_top
 ```
 
-## 2) Pin the Vivado version you want
-
-If you want your home machine to consistently use 2025.2, add one of these to `~/.bashrc` **before** the helper is sourced:
+If you are already in a module directory:
 
 ```bash
-export VIVADO_VERSION=2025.2
+cd lab_project/pong
+ecmake sim
 ```
 
-If auto-detection misses your install, set the exact file instead:
-
-```bash
-export VIVADO_SETTINGS=/absolute/path/to/settings64.sh
-```
-
-## 3) Root-level workflow
-
-From the repo root:
+## 4) Root-level equivalent
 
 ```bash
 make mods
@@ -50,28 +70,6 @@ make synth MOD=lab_project/project_top
 make implement MOD=lab_project/project_top
 ```
 
-You can still use the original class flow too:
+## 5) Version parity note
 
-```bash
-cd lab_project/project_top
-make synth
-make implement
-```
-
-The difference now is that the Make infrastructure auto-sources Vivado when needed.
-
-## 4) Important note about exact class parity
-
-Your class machine example used Vivado 2024.1. You installed 2025.2.
-That is usually fine for simulation and synthesis, but if you want exact behavior parity with the lab machines, install 2024.1 and set:
-
-```bash
-export VIVADO_VERSION=2024.1
-```
-
-## 5) Expected module usage pattern
-
-- `sim` is for modules that have a local `sim.tcl`
-- `sim_tb` is for modules that have a local `tb.sv`
-- `synth` / `implement` are typically for the `*_top` modules with `basys3.xdc`
-- `download` also needs `openocd`
+If you want behavior closest to a specific class lab image, match Vivado version when possible. Otherwise the helper flow remains the same.
