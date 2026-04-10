@@ -28,11 +28,11 @@ sim_tb: work
 	@if [ -z "$(SV_FILES)" ]; then echo "Error: SV_FILES not set"; exit 1; fi
 	@if [ ! -f tb.sv ]; then echo "Error: tb.sv not found in $(CURDIR). Use make sim if this module is sim.tcl-driven."; exit 1; fi
 	cd work; \
-	. ../../../resources/vivado_env.sh; \
+	. ../$(REPO_PATH)/resources/vivado_env.sh; \
 	xvlog ../tb.sv $(addprefix ../,$(SV_FILES)) -sv > xvlog_tb.log 2>&1; \
 	cat xvlog_tb.log; \
 	if grep -q '^ERROR:' xvlog_tb.log; then exit 1; fi; \
-	xvlog ../../../resources/cells_sim.v > xvlog_cells.log 2>&1; \
+	xvlog ../$(REPO_PATH)/resources/cells_sim.v > xvlog_cells.log 2>&1; \
 	cat xvlog_cells.log; \
 	if grep -q '^ERROR:' xvlog_cells.log; then exit 1; fi; \
 	xelab tb -debug typical --timescale 1ns/1ps > xelab.log 2>&1; \

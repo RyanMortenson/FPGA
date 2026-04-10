@@ -39,7 +39,7 @@ ecdoctor
 
 ```bash
 ecmods
-ecmake graphics_project/pong sim
+ecmake demo/pong sim
 ecmake graphics_project/project_top synth
 ```
 

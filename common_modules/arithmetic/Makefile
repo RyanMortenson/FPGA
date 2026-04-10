@@ -1,20 +1,16 @@
-
-# Add your rules here
-background.mem: background.txt
-	python3 ../text_rendering/gen_initial_chars.py background.txt background.mem
-
-
 clean:
-	cd decrypt_rc4; make clean
-	rm -f background.mem
+	cd full_add; make clean
+	cd add_8; make clean
+	cd arithmetic_top; make clean
+
 
 ################################# Passoff rules ################################
-ENV_PATH = ../.venv/
+ENV_PATH = ../../.venv/
 IN_ENV = . $(ENV_PATH)/bin/activate;
 
 $(ENV_PATH)/bin/activate:
 	python3 -m venv $(ENV_PATH)
-	$(IN_ENV) pip install -r ../requirements.txt
+	$(IN_ENV) pip install -r ../../requirements.txt
 
 passoff_check: $(ENV_PATH)/bin/activate
 	$(IN_ENV) python passoff.py
