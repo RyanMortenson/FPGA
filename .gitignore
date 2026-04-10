@@ -1,0 +1,41 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# FPGA / Vivado generated build products
+work/
+.Xil/
+xsim.dir/
+webtalk/
+*.jou
+*.log
+*.pb
+*.str
+*.wdb
+*.wcfg
+*.xdbg
+*.bit
+*.bin
+*.ltx
+*.dcp
+*.runs/
+*.cache/
+*.hw/
+*.ip_user_files/
+*.sim/
+*.gen/
+
+# OS / editor clutter
+.DS_Store
+Thumbs.db
+*~
+.vscode/*.code-workspace
+
+# Repo-specific generated files
+reverse.txt
+bottom.txt
+.commitdate
+
+# Memory init files are usually source, so keep them tracked unless you know they are generated
+# *.mem

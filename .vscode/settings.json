@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./resources/"
+    ],
+    "window.title": "ECEN 320"
+}
