@@ -1,46 +1,36 @@
-# Windows Git Bash Setup for ECEN 320-Style Flow
+# CachyOS Setup for ECEN 320-Style Flow
 
-## 1) Recommended path
+This repository is Linux-first and optimized for CachyOS.
 
-Place repo at a stable path, for example:
+## 1) Install dependencies
 
-`/c/Users/<you>/FPGA`
+```bash
+sudo pacman -S --needed git make python openocd
+```
 
 ## 2) Configure `~/.bashrc`
 
 ```bash
-export FPGA_REPO='/c/Users/<you>/FPGA'
-export VIVADO_ROOT='/c/AMDDesignTools/2025.2/Vivado'
-# If your environment doesn't expose `make`, uncomment:
-# export EC_MAKE_CMD=mingw32-make
+export FPGA_REPO="$HOME/FPGA"
+export VIVADO_ROOT="/tools/Xilinx/Vivado/2025.2"
+# Optional alternative:
+# export VIVADO_SETTINGS="/tools/Xilinx/Vivado/2025.2/settings64.sh"
 source "$FPGA_REPO/resources/shell_helpers.sh"
 ```
 
-If auto-detection cannot locate Vivado, set one of:
-
-```bash
-export VIVADO_ROOT='/c/Xilinx/Vivado/2025.2'
-```
-
-or
-
-```bash
-export VIVADO_SETTINGS='/c/Xilinx/Vivado/2025.2/settings64.bat'
-```
-
-## 3) Reload + test
+## 3) Reload + validate
 
 ```bash
 source ~/.bashrc
 ecdoctor
 ```
 
-## 4) Use helper commands
+## 4) Build flow examples
 
 ```bash
 ecmods
-ecmake demo/pong sim
-ecmake demo/pong/project_top synth
+ecmake demo/pong sim_nogui
+ecmake demo/project_top synth
+ecmake demo/project_top implement
+ecmake demo/project_top download
 ```
-
-This is the smoothest route on Windows because the helper handles Vivado environment setup and make-command differences for you.

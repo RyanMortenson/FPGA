@@ -1,24 +1,17 @@
-# Home Workflow (Cross-Platform)
+# Home Workflow (CachyOS / Arch Linux)
 
-This repo keeps class Makefiles intact while making the shell experience consistent across Arch Linux and Windows Git Bash.
+This repo uses a Linux-native workflow centered on Bash + GNU Make.
 
-## 1) One-time setup
+## 1) One-time shell setup
 
 Add to `~/.bashrc`:
 
 ```bash
 export FPGA_REPO="/absolute/path/to/FPGA"
-# Arch Linux example:
-# export VIVADO_ROOT="/tools/Xilinx/Vivado/2025.2"
-# Windows Git Bash example:
-# export VIVADO_ROOT='/c/AMDDesignTools/2025.2/Vivado'
+export VIVADO_ROOT="/tools/Xilinx/Vivado/2025.2"
+# Optional alternative:
+# export VIVADO_SETTINGS="/tools/Xilinx/Vivado/2025.2/settings64.sh"
 source "$FPGA_REPO/resources/shell_helpers.sh"
-```
-
-If needed (mostly Windows), pin make executable:
-
-```bash
-export EC_MAKE_CMD=mingw32-make
 ```
 
 Reload:
@@ -27,7 +20,7 @@ Reload:
 source ~/.bashrc
 ```
 
-## 2) Validate
+## 2) Validate environment
 
 ```bash
 ecdoctor
@@ -36,40 +29,28 @@ ecdoctor
 `ecdoctor` checks:
 - `git`
 - `python3`
-- GNU make-compatible command (`make`, `mingw32-make`, or `gmake`)
-- Vivado toolchain (`vivado`, `xvlog`, `xelab`, `xsim`)
+- `make`
+- Vivado tools (`vivado`, `xvlog`, `xelab`, `xsim`)
 
-## 3) Recommended daily flow
+## 3) Daily flow
 
 ```bash
 fpga
 ecmods
 ecmake demo/pong sim
-ecmake common_modules/multi_segment/seven_segment4 sim_tb
-ecmake demo/pong/project_top synth
-ecmake demo/pong/project_top implement
-ecbit demo/pong/project_top
-ecclean demo/pong/project_top
+ecmake demo/project_top synth
+ecmake demo/project_top implement
+ecbit demo/project_top
+ecclean demo/project_top
 ```
 
-If you are already in a module directory:
-
-```bash
-cd demo/pong
-ecmake sim
-```
-
-## 4) Root-level equivalent
+## 4) Root-level equivalents
 
 ```bash
 make mods
 make doctor
 make sim MOD=demo/pong
-make sim_tb MOD=common_modules/multi_segment/seven_segment4
-make synth MOD=demo/pong/project_top
-make implement MOD=demo/pong/project_top
+make synth MOD=demo/project_top
+make implement MOD=demo/project_top
+make download MOD=demo/project_top
 ```
-
-## 5) Version parity note
-
-If you want behavior closest to a specific class lab image, match Vivado version when possible. Otherwise the helper flow remains the same.
