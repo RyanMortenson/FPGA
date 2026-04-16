@@ -23,7 +23,7 @@ detect_make_cmd() {
     fi
 
     local candidate
-    for candidate in make mingw32-make gmake; do
+    for candidate in make; do
         if command -v "${candidate}" >/dev/null 2>&1; then
             printf '%s\n' "${candidate}"
             return 0
@@ -49,7 +49,7 @@ if make_cmd="$(detect_make_cmd)"; then
     status_ok "found make command: ${make_cmd} ($(command -v "${make_cmd}"))"
     "${make_cmd}" --version | head -n 1 || true
 else
-    status_fail 'missing GNU make compatible command (make, mingw32-make, or gmake)'
+    status_fail 'missing GNU make command (make)'
     exit 1
 fi
 
@@ -67,6 +67,6 @@ if . "${repo_root}/resources/vivado_env.sh" >/dev/null 2>&1 && \
     vivado -version | head -n 1
 else
     status_fail 'Vivado environment could not be initialized'
-    printf 'hint: set VIVADO_ROOT and/or VIVADO_SETTINGS for your OS before running builds\n'
+    printf 'hint: set VIVADO_ROOT and/or VIVADO_SETTINGS (settings64.sh) before running builds\n'
     exit 1
 fi

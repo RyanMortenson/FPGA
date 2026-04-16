@@ -23,7 +23,7 @@ _ec_detect_make_cmd() {
     fi
 
     local candidate
-    for candidate in make mingw32-make gmake; do
+    for candidate in make; do
         if command -v "$candidate" >/dev/null 2>&1; then
             printf '%s\n' "$candidate"
             return 0
@@ -36,7 +36,7 @@ _ec_detect_make_cmd() {
 _ec_require_make_cmd() {
     local make_cmd
     make_cmd="$(_ec_detect_make_cmd)" || {
-        echo "No GNU make compatible command found. Install make (Arch Linux: `pacman -S make`) or mingw32-make (Windows/Git Bash)." >&2
+        echo "No GNU make command found. Install it with: sudo pacman -S --needed make" >&2
         return 1
     }
     printf '%s\n' "$make_cmd"
@@ -60,35 +60,15 @@ _ec_show_log_and_check() {
     return 0
 }
 
-_ec_is_windows_gitbash() {
-    case "$(uname -s 2>/dev/null || true)" in
-        MINGW*|MSYS*|CYGWIN*) return 0 ;;
-        *) return 1 ;;
-    esac
-}
-
 _ec_kill_vivado_processes() {
-    if _ec_is_windows_gitbash; then
-        /c/Windows/System32/taskkill.exe /IM xsimk.exe /F >/dev/null 2>&1 || true
-        /c/Windows/System32/taskkill.exe /IM xsim.exe /F >/dev/null 2>&1 || true
-        /c/Windows/System32/taskkill.exe /IM xelab.exe /F >/dev/null 2>&1 || true
-        /c/Windows/System32/taskkill.exe /IM xvlog.exe /F >/dev/null 2>&1 || true
-        /c/Windows/System32/taskkill.exe /IM vivado.exe /F >/dev/null 2>&1 || true
-    else
-        command -v pkill >/dev/null 2>&1 && pkill -f xsim >/dev/null 2>&1 || true
-        command -v pkill >/dev/null 2>&1 && pkill -f xelab >/dev/null 2>&1 || true
-        command -v pkill >/dev/null 2>&1 && pkill -f xvlog >/dev/null 2>&1 || true
-        command -v pkill >/dev/null 2>&1 && pkill -f vivado >/dev/null 2>&1 || true
-    fi
+    command -v pkill >/dev/null 2>&1 && pkill -f xsim >/dev/null 2>&1 || true
+    command -v pkill >/dev/null 2>&1 && pkill -f xelab >/dev/null 2>&1 || true
+    command -v pkill >/dev/null 2>&1 && pkill -f xvlog >/dev/null 2>&1 || true
+    command -v pkill >/dev/null 2>&1 && pkill -f vivado >/dev/null 2>&1 || true
 }
 
 _ec_remove_workdir() {
     local workdir="$1"
-    if _ec_is_windows_gitbash; then
-        local winpath
-        winpath=$(cygpath -w "$workdir")
-        /c/Windows/System32/cmd.exe //C "rmdir /S /Q \"$winpath\"" >/dev/null 2>&1 || true
-    fi
     rm -rf "$workdir"
 }
 
