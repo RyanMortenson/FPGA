@@ -26,7 +26,7 @@ localparam int SCREEN_W      = 320;
 localparam int SCREEN_H      = 240;
 localparam int PADDLE_HEIGHT = 40;
 localparam int BALL_SIZE     = 4;
-localparam int WAIT_COUNT    = 24'd250_000; // 2.5 ms at 100 MHz
+localparam int WAIT_COUNT    = 24'd750_000; // 2.5 ms at 100 MHz
 
 // registers and logic for controlling the movement of the ball and paddles, detecting collisions, and updating the VGA outputs accordingly will go here.
 logic [8:0] ball_x; 
