@@ -9,6 +9,7 @@
 module audio_fft_vga_top (
     input  logic        clk,
     input  logic        btnc,
+    input  logic [8:0]  sw,
 
     output logic        Hsync,
     output logic        Vsync,
@@ -16,7 +17,7 @@ module audio_fft_vga_top (
     output logic [3:0]  vgaGreen,
     output logic [3:0]  vgaBlue,
 
-    // JC1..JC4 optional DAC side (driven quiet/idle)
+    // JC1..JC4 DAC side
     output logic        jc1_dac_mclk,
     output logic        jc2_dac_lrck,
     output logic        jc3_dac_sclk,
@@ -37,6 +38,8 @@ module audio_fft_vga_top (
     logic signed [23:0] right_sample;
     logic sample_strobe;
     logic signed [23:0] mono_sample;
+    logic signed [23:0] left_out_sample;
+    logic signed [23:0] right_out_sample;
 
     logic [31:0][7:0] bar_heights;
     logic bars_valid;
@@ -77,6 +80,8 @@ module audio_fft_vga_top (
         .rst(btnc),
         .sample_strobe(sample_strobe),
         .sample_in(mono_sample),
+        .noise_floor_ctrl(sw[3:0]),
+        .sensitivity_ctrl(sw[5:4]),
         .bar_heights(bar_heights),
         .bars_valid(bars_valid)
     );
@@ -86,16 +91,37 @@ module audio_fft_vga_top (
         .pixel_y(pixel_y),
         .blank(blank),
         .bar_heights(bar_heights),
+        .color_scale_ctrl(sw[7:6]),
         .red(red_pix),
         .green(green_pix),
         .blue(blue_pix)
     );
 
-    // Optional DAC side left idle. (Output support intentionally omitted.)
+    // DAC line-out passthrough uses the same I2S clocks as ADC capture.
     assign jc1_dac_mclk = jc7_adc_mclk;
-    assign jc2_dac_lrck = 1'b0;
+    assign jc2_dac_lrck = jc8_adc_lrck;
     assign jc3_dac_sclk = jc9_adc_sclk;
-    assign jc4_dac_sdin = 1'b0;
+
+    audio_echo_reverb audio_echo_reverb_inst (
+        .clk(clk),
+        .rst(btnc),
+        .sample_strobe(sample_strobe),
+        .reverb_en(sw[8]),
+        .left_in(left_sample),
+        .right_in(right_sample),
+        .left_out(left_out_sample),
+        .right_out(right_out_sample)
+    );
+
+    i2s2_dac_transmitter i2s2_dac_transmitter_inst (
+        .clk(clk),
+        .rst(btnc),
+        .dac_sclk(jc3_dac_sclk),
+        .left_sample_in(left_out_sample),
+        .right_sample_in(right_out_sample),
+        .sample_strobe(sample_strobe),
+        .dac_sdin(jc4_dac_sdin)
+    );
 
     assign vgaRed   = red_pix;
     assign vgaGreen = green_pix;
