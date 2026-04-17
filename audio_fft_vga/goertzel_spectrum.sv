@@ -21,6 +21,8 @@ module goertzel_spectrum #(
     input  logic                                 rst,
     input  logic                                 sample_strobe,
     input  logic signed [SAMPLE_W-1:0]           sample_in,
+    input  logic [3:0]                           noise_floor_ctrl,
+    input  logic [1:0]                           sensitivity_ctrl,
 
     output logic [N_BINS-1:0][BAR_HEIGHT_W-1:0]  bar_heights,
     output logic                                 bars_valid
@@ -86,28 +88,89 @@ module goertzel_spectrum #(
     logic signed [2*INTERNAL_W+COEF_W-1:0] cross_term_mult;
     logic signed [2*INTERNAL_W:0] mag_sq;
 
+    logic [7:0] log_mag;
+    logic [8:0] floor_subtracted;
+    logic [7:0] floor_db;
+    logic [9:0] scaled_mag;
+    logic [7:0] mapped_height;
+    logic [7:0] prev_height;
+    logic [10:0] smooth_acc;
     logic [BAR_HEIGHT_W-1:0] next_height;
 
+    function automatic [7:0] log2_like_u65(input logic [2*INTERNAL_W:0] value);
+        int msb;
+        logic [2*INTERNAL_W:0] shifted;
+        logic [3:0] frac;
+        logic [8:0] tmp;
+        begin
+            msb = -1;
+            for (int j = 2*INTERNAL_W; j >= 0; j--) begin
+                if ((msb == -1) && value[j]) begin
+                    msb = j;
+                end
+            end
+
+            if (msb < 0) begin
+                log2_like_u65 = 8'd0;
+            end else begin
+                shifted = value << ((2*INTERNAL_W) - msb);
+                frac = shifted[2*INTERNAL_W-1 -: 4];
+                tmp = (msb << 2) + frac;
+                if (tmp > 9'd255) begin
+                    log2_like_u65 = 8'hFF;
+                end else begin
+                    log2_like_u65 = tmp[7:0];
+                end
+            end
+        end
+    endfunction
+
     // Keep internal dynamic range reasonable.
-    assign sample_scaled = {{(INTERNAL_W-SAMPLE_W){sample_in[SAMPLE_W-1]}}, sample_in} >>> 6;
+    assign sample_scaled = {{(INTERNAL_W-SAMPLE_W){sample_in[SAMPLE_W-1]}}, sample_in} >>> 7;
 
     always_comb begin
         mult_term = q1[bin_idx] * coef_rom[bin_idx];
         q0_next   = sample_scaled + (mult_term >>> COEF_SHIFT) - q2[bin_idx];
 
-        q1_sq          = q1[bin_idx] * q1[bin_idx];
-        q2_sq          = q2[bin_idx] * q2[bin_idx];
-        q1q2           = q1[bin_idx] * q2[bin_idx];
+        q1_sq           = q1[bin_idx] * q1[bin_idx];
+        q2_sq           = q2[bin_idx] * q2[bin_idx];
+        q1q2            = q1[bin_idx] * q2[bin_idx];
         cross_term_mult = q1q2 * coef_rom[bin_idx];
-        mag_sq         = q1_sq + q2_sq - (cross_term_mult >>> COEF_SHIFT);
+        mag_sq          = q1_sq + q2_sq - (cross_term_mult >>> COEF_SHIFT);
 
         if (mag_sq[2*INTERNAL_W]) begin
-            next_height = '0;
-        end else if (|mag_sq[2*INTERNAL_W-1:34]) begin
-            next_height = {BAR_HEIGHT_W{1'b1}};
+            log_mag = 8'd0;
         end else begin
-            // log-ish compression by taking upper bits.
-            next_height = mag_sq[26 +: BAR_HEIGHT_W];
+            log_mag = log2_like_u65(mag_sq);
+        end
+
+        // User-adjustable floor: 0..120 (about 8 units/step).
+        floor_db = {noise_floor_ctrl, 3'b000};
+
+        if (log_mag > floor_db) begin
+            floor_subtracted = {1'b0, log_mag} - {1'b0, floor_db};
+        end else begin
+            floor_subtracted = 9'd0;
+        end
+
+        // Base attenuation + user sensitivity trim keeps default from saturating.
+        scaled_mag = ({2'b00, floor_subtracted} * 10'd3) >> (2 + sensitivity_ctrl);
+
+        if (scaled_mag > 10'd239) begin
+            mapped_height = 8'd239;
+        end else begin
+            mapped_height = scaled_mag[7:0];
+        end
+
+        prev_height = bar_heights[bin_idx];
+
+        // Fast attack, slow decay smoothing to stabilize the display.
+        if (mapped_height >= prev_height) begin
+            smooth_acc = {2'b00, mapped_height} + {2'b00, prev_height};
+            next_height = smooth_acc[8:1];
+        end else begin
+            smooth_acc = ({2'b00, prev_height, 1'b0} + {3'b000, prev_height} + {3'b000, mapped_height});
+            next_height = smooth_acc[9:2];
         end
     end
 

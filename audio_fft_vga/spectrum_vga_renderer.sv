@@ -14,6 +14,7 @@ module spectrum_vga_renderer #(
     input  logic [9:0]                               pixel_y,
     input  logic                                     blank,
     input  logic [N_BINS-1:0][BAR_HEIGHT_W-1:0]      bar_heights,
+    input  logic [1:0]                               color_scale_ctrl,
 
     output logic [3:0]                               red,
     output logic [3:0]                               green,
@@ -30,6 +31,9 @@ module spectrum_vga_renderer #(
     logic in_graph_x;
     logic in_bar;
     logic grid_line;
+
+    logic [7:0] low_th;
+    logic [7:0] mid_th;
 
     always_comb begin
         in_graph_x = (pixel_x < N_BINS*BAR_W);
@@ -51,19 +55,22 @@ module spectrum_vga_renderer #(
 
         grid_line = ((pixel_y >= GRAPH_TOP) && (pixel_y <= GRAPH_BASE) && (pixel_y[4:0] == 5'd0));
 
+        low_th = 8'd52 + ({6'd0, color_scale_ctrl} << 3);
+        mid_th = 8'd122 + ({6'd0, color_scale_ctrl} << 3);
+
         red   = 4'h0;
         green = 4'h0;
         blue  = 4'h0;
 
         if (!blank) begin
             if (in_bar) begin
-                if (bar_idx < 10) begin
-                    red = 4'h2;
-                    green = 4'hF;
-                    blue = 4'h2;
-                end else if (bar_idx < 22) begin
-                    red = 4'hE;
+                if (bar_height < low_th) begin
+                    red = 4'h0;
                     green = 4'hD;
+                    blue = 4'h3;
+                end else if (bar_height < mid_th) begin
+                    red = 4'hD;
+                    green = 4'hC;
                     blue = 4'h2;
                 end else begin
                     red = 4'hF;
