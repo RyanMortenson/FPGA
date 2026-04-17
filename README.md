@@ -182,3 +182,6 @@ make download MOD=demo/project_top
   - `demo/pong`
   - `demo/project_top`
   - `common_modules/seven_segment/seven_segment`
+- Audio examples:
+  - `audio_fft_vga` (audio-in spectrum display over VGA)
+  - `audio_reverb` (audio passthrough + optional echo)
