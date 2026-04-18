@@ -10,6 +10,7 @@ import argparse
 import os
 # Subprocess library for running openocd command
 import subprocess
+import sys
 
 def main():
 	''' Main executable for script
@@ -63,5 +64,7 @@ def main():
 		if os.path.exists(ocd_filename):
 			os.remove(ocd_filename)
 
+	return p.returncode
+
 if __name__ == "__main__":
-	main()
+	sys.exit(main())
